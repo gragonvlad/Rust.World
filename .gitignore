@@ -7,3 +7,8 @@ Temp
 *.sln
 bin
 obj
+*.xml
+*.meta
+*.iml
+JetBrains
+*.user

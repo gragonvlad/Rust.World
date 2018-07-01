@@ -11,22 +11,16 @@ public class WorldSerialization
 {
 	public const uint CurrentVersion = 8;
 
-	public uint Version
-	{
-		get; private set;
-	}
+	public uint Version  { get; private set; }
+	public string Checksum { get; private set; }
+	public WorldData World { get; private set; }
 
-	public string Checksum
-	{
-		get; private set;
-	}
-
-	public WorldData world = new WorldData();
 
 	public WorldSerialization()
 	{
-		Version = CurrentVersion;
-		Checksum = null;
+		this.Version = CurrentVersion;
+		this.Checksum = null;
+		this.World =  new WorldData();
 	}
 
 	[ProtoContract]
@@ -116,9 +110,9 @@ public class WorldSerialization
 
 	public MapData GetMap(string name)
 	{
-		for (int i = 0; i < world.maps.Count; i++)
+		for (int i = 0; i < this.World.maps.Count; i++)
 		{
-			if (world.maps[i].name == name) return world.maps[i];
+			if (this.World.maps[i].name == name) return this.World.maps[i];
 		}
 		return null;
 	}
@@ -130,12 +124,12 @@ public class WorldSerialization
 		map.name = name;
 		map.data = data;
 
-		world.maps.Add(map);
+		this.World.maps.Add(map);
 	}
 
 	public IEnumerable<PrefabData> GetPrefabs(string category)
 	{
-		return world.prefabs.Where(p => p.category == category);
+		return this.World.prefabs.Where(p => p.category == category);
 	}
 
 	public void AddPrefab(string category, uint id, Vector3 position, Quaternion rotation, Vector3 scale)
@@ -148,33 +142,33 @@ public class WorldSerialization
 		prefab.rotation = rotation;
 		prefab.scale = scale;
 
-		world.prefabs.Add(prefab);
+		this.World.prefabs.Add(prefab);
 	}
 
 	public IEnumerable<PathData> GetPaths(string name)
 	{
-		return world.paths.Where(p => p.name.Contains(name));
+		return this.World.paths.Where(p => p.name.Contains(name));
 	}
 
 	public PathData GetPath(string name)
 	{
-		for (int i = 0; i < world.paths.Count; i++)
+		for (int i = 0; i < this.World.paths.Count; i++)
 		{
-			if (world.paths[i].name == name) return world.paths[i];
+			if (this.World.paths[i].name == name) return this.World.paths[i];
 		}
 		return null;
 	}
 
 	public void AddPath(PathData path)
 	{
-		world.paths.Add(path);
+		this.World.paths.Add(path);
 	}
 
 	public void Clear()
 	{
-		world.maps.Clear();
-		world.prefabs.Clear();
-		world.paths.Clear();
+		this.World.maps.Clear();
+		this.World.prefabs.Clear();
+		this.World.paths.Clear();
 
 		Version = CurrentVersion;
 		Checksum = null;
@@ -192,7 +186,7 @@ public class WorldSerialization
 
 					using (var compressionStream = new LZ4Stream(fileStream, LZ4StreamMode.Compress))
 					{
-						Serializer.Serialize(compressionStream, world);
+						Serializer.Serialize(compressionStream, this.World);
 					}
 				}
 			}
@@ -219,13 +213,12 @@ public class WorldSerialization
 					{
 						using (var compressionStream = new LZ4Stream(fileStream, LZ4StreamMode.Decompress))
 						{
-							world = Serializer.Deserialize<WorldData>(compressionStream);
+							this.World = Serializer.Deserialize<WorldData>(compressionStream);
+							this.Checksum = Hash();
 						}
 					}
 				}
 			}
-
-			Checksum = Hash();
 		}
 		catch (Exception e)
 		{
@@ -251,7 +244,7 @@ public class WorldSerialization
 			}
 		}
 
-		var prefabs = world.prefabs;
+		var prefabs = this.World.prefabs;
 		if (prefabs != null)
 		{
 			for (int i = 0; i < prefabs.Count; i++)

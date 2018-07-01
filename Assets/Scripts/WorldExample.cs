@@ -20,13 +20,13 @@ public class WorldExample : MonoBehaviour
 	private string GetInfo(WorldSerialization blob)
 	{
 		// Resolution of the terrain height and water maps
-		var meshResolution = Mathf.NextPowerOfTwo((int)(blob.world.size * 0.50f)) + 1;
+		var meshResolution = Mathf.NextPowerOfTwo((int)(blob.World.size * 0.50f)) + 1;
 
 		// Resolution of the terrain splat, topology, biome and alpha maps
-		var textureResolution = Mathf.NextPowerOfTwo((int)(blob.world.size * 0.50f));
+		var textureResolution = Mathf.NextPowerOfTwo((int)(blob.World.size * 0.50f));
 
 		// The dimensions of the terrain object, Y always goes from -500 to +500, X and Z from -extents to +extents
-		var terrainSize = new Vector3(blob.world.size, 1000, blob.world.size);
+		var terrainSize = new Vector3(blob.World.size, 1000, blob.World.size);
 
 		// The position of the terrain object, chosen so world origin is always at the center of the terrain bounds
 		var terrainPosition = -0.5f * terrainSize;
@@ -154,7 +154,7 @@ public class WorldExample : MonoBehaviour
 		sb.AppendLine();
 		sb.AppendLine("Paths");
 		sb.Append("\t");
-		sb.Append(blob.world.paths.Count);
+		sb.Append(blob.World.paths.Count);
 
 		return sb.ToString();
 	}
